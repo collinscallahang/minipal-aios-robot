@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MiniPal 仿真控制台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="stage-panel" aria-label="MiniPal robot simulator">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">AIOS 桌面机器人 MVP</p>
+            <h1>MiniPal 仿真控制台</h1>
+          </div>
+          <div class="status-pill" id="connectionStatus">UART SIM 已连接</div>
+        </div>
+
+        <div class="robot-stage">
+          <div class="distance-beam" id="distanceBeam"></div>
+          <div class="robot-shadow"></div>
+          <div class="robot" id="robot">
+            <div class="head" id="robotHead">
+              <div class="sensor-row">
+                <div class="sensor-eye"></div>
+                <div class="sensor-eye"></div>
+              </div>
+              <div class="face-slot"></div>
+            </div>
+            <div class="neck"></div>
+            <div class="body">
+              <div class="led-ring" id="ledRing"></div>
+              <div class="board-window">
+                <span>ESP32</span>
+                <span>STATE <strong id="stateReadout">IDLE</strong></span>
+              </div>
+              <div class="speaker-slot" id="speakerSlot"></div>
+            </div>
+          </div>
+          <div class="distance-card">
+            <span>前方距离</span>
+            <strong id="distanceValue">36 cm</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="control-panel" aria-label="Controls">
+        <div class="section-title">
+          <p class="eyebrow">Input</p>
+          <h2>输入与 AI 决策</h2>
+        </div>
+
+        <div class="control-row">
+          <button class="primary-action" id="wakeButton" type="button">
+            <span class="button-icon">●</span>
+            按钮唤醒
+          </button>
+          <button class="ghost-action" id="resetButton" type="button">复位</button>
+        </div>
+
+        <label class="slider-block" for="distanceSlider">
+          <span>距离传感器 HC-SR04</span>
+          <input id="distanceSlider" type="range" min="6" max="80" value="36" />
+        </label>
+
+        <div class="mode-group" role="group" aria-label="AI mode">
+          <button class="mode-button is-active" id="localMode" type="button">本地规则</button>
+          <button class="mode-button" id="cloudMode" type="button">云端 API 仿真</button>
+        </div>
+
+        <div class="scenario-grid">
+          <button id="normalScenario" type="button">问候场景</button>
+          <button id="alertScenario" type="button">靠近告警</button>
+          <button id="thinkingScenario" type="button">思考动作</button>
+        </div>
+
+        <div class="output-summary">
+          <div>
+            <span>舵机</span>
+            <strong id="servoReadout">90 deg</strong>
+          </div>
+          <div>
+            <span>LED</span>
+            <strong id="ledReadout">待机蓝</strong>
+          </div>
+          <div>
+            <span>蜂鸣器</span>
+            <strong id="buzzerReadout">静音</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="logic-panel" aria-label="State machine and logs">
+        <div class="section-title">
+          <p class="eyebrow">Decision</p>
+          <h2>状态机与串口日志</h2>
+        </div>
+
+        <div class="state-map" id="stateMap">
+          <div class="state-node is-active" data-state="IDLE">IDLE</div>
+          <div class="state-arrow">→</div>
+          <div class="state-node" data-state="WAKE">WAKE</div>
+          <div class="state-arrow">→</div>
+          <div class="state-node" data-state="TRACK">TRACK</div>
+          <div class="state-arrow">→</div>
+          <div class="state-node" data-state="COOLDOWN">COOLDOWN</div>
+          <div class="state-node alert-node" data-state="ALERT">ALERT</div>
+        </div>
+
+        <div class="ai-decision">
+          <span>AI 动作建议</span>
+          <strong id="actionReadout">IDLE</strong>
+        </div>
+
+        <div class="log-window" id="logWindow" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
