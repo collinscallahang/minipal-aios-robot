@@ -1,0 +1,14 @@
+.DS_Store
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+.env
+.github_token
+.github_token.txt
+.venv/
+venv/
+.pio/
+.pytest_cache/
