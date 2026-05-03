@@ -1,122 +1,140 @@
 # 系统架构设计
 
-## 总体结构图
+## 完整系统结构图
 
 ```mermaid
 flowchart LR
-    subgraph Input["输入层"]
-        BTN["按钮"]
-        DIST["HC-SR04 距离传感器"]
-        USER["主机文本输入 / 可选语音结果"]
+    subgraph Input["输入层 Input"]
+        MIC["Mic / 语音输入\n可选：主机麦克风或语音转文本"]
+        BTN["Button / 顶部按钮\n用于主动唤醒"]
+        SENSOR["Sensor / HC-SR04 距离传感器\n用于前方距离检测"]
     end
 
-    subgraph Control["控制层"]
-        ESP["ESP32 MCU"]
-        HOST["Python AI 桥接"]
-        CLOUD["可选云端大模型 API"]
+    subgraph Control["控制层 Control"]
+        MCU["MCU / ESP32\n实时采样、状态机、执行器控制"]
+        CPU["CPU / PC or Host Python\nAI桥接、日志、仿真界面"]
+        AI["AI Decision\n本地规则 / 可选云端API"]
     end
 
-    subgraph Output["输出层"]
-        SERVO["SG90 舵机"]
-        LED["WS2812 RGB LED"]
-        BUZZER["蜂鸣器"]
-        SCREEN["主机控制台 / 可选界面"]
+    subgraph Output["输出层 Output"]
+        SERVO["Servo / SG90 舵机\n头部转动或警觉姿态"]
+        LED["LED / WS2812 RGB\n状态颜色反馈"]
+        SPEAKER["Speaker / 蜂鸣器\n确认音与告警音"]
+        SCREEN["Screen / 浏览器仿真界面\n状态机、日志、传感器读数"]
     end
 
-    BTN -->|"GPIO 中断"| ESP
-    DIST -->|"距离数据"| ESP
-    USER -->|"文本 / 语音转文本"| HOST
-    ESP -->|"UART 事件"| HOST
-    HOST -->|"UART 动作指令"| ESP
-    HOST -->|"HTTPS"| CLOUD
-    ESP -->|"PWM"| SERVO
-    ESP -->|"数字输出"| BUZZER
-    ESP -->|"单总线"| LED
-    HOST --> SCREEN
+    subgraph Comm["通信层 Communication"]
+        UART["USB UART\nESP32 <-> Host"]
+        WIFI["WiFi / HTTPS\nHost <-> Cloud API"]
+        BLE["Bluetooth\n可选移动端扩展"]
+    end
+
+    MIC -->|"语音/文本事件"| CPU
+    BTN -->|"GPIO interrupt"| MCU
+    SENSOR -->|"echo time / distance cm"| MCU
+
+    MCU -->|"EVENT:BUTTON / DIST:x"| UART
+    UART --> CPU
+    CPU -->|"用户意图 + 传感器上下文"| AI
+    AI -->|"ACT:GREET / THINK / RETREAT"| CPU
+    CPU -->|"ACT:*"| UART
+    UART --> MCU
+
+    CPU -.->|"可选云端推理"| WIFI
+    WIFI -.-> AI
+    BLE -.->|"可选遥控/配置"| CPU
+
+    MCU -->|"PWM"| SERVO
+    MCU -->|"single-wire data"| LED
+    MCU -->|"digital/PWM tone"| SPEAKER
+    CPU -->|"simulation UI / logs"| SCREEN
 ```
 
-## 各模块作用
+## 模块作用
 
 ### 输入模块
 
-- 按钮：人为触发一次交互，最稳定，适合演示。
-- 距离传感器：检测前方障碍物，用于“靠太近就警觉/后退”的闭环行为。
-- 主机输入：可选的文本输入或语音转文本结果，用来触发更像 AI 的上层逻辑。
+- `Mic / 语音输入`：可选输入，用于把用户语音转成文本意图。当前 MVP 中不依赖实体麦克风，浏览器仿真和主机侧输入可以替代语音入口。
+- `Button / 顶部按钮`：主要交互入口。用户按下按钮后，ESP32 触发中断并进入唤醒流程。
+- `Sensor / HC-SR04 距离传感器`：检测前方距离，用于实现“靠太近就警觉/避让”的实时闭环。
 
 ### 控制模块
 
-- ESP32：负责所有实时任务，包括采样、状态机、执行器控制和串口通信。
-- Python AI 桥接：负责把“事件”转换成“动作建议”。
-- 云端 API：只做高层语义判断，不直接控制硬件。
+- `MCU / ESP32`：负责实时控制，包括读取按钮和距离传感器、运行状态机、控制舵机/LED/蜂鸣器，并通过 UART 与主机通信。
+- `CPU / Host Python`：负责高层逻辑，包括接收 MCU 事件、执行本地 AI 规则、调用可选云端 API、记录日志，以及运行浏览器仿真界面。
+- `AI Decision`：把输入事件和上下文转换成动作建议，例如 `GREET`、`THINK`、`RETREAT`。实时安全动作仍由 MCU 本地兜底。
 
 ### 输出模块
 
-- 舵机：表现头部转动或后仰动作。
-- LED：用颜色表达状态。
-- 蜂鸣器：提供确认音和告警音。
-- 主机界面：打印日志，辅助演示和调试。
+- `Servo / SG90 舵机`：表现头部动作，例如问候时左右摆动、告警时抬头或转向。
+- `LED / WS2812 RGB`：用颜色表达状态，例如待机蓝、唤醒绿、告警红、冷却橙。
+- `Speaker / 蜂鸣器`：输出确认音和告警音，让反馈更明确。
+- `Screen / 浏览器仿真界面`：展示状态机、距离数值、AI 决策、串口日志和输出状态；没有实体硬件时作为主要演示界面。
 
-## 数据流
+### 通信模块
 
-标准数据流是：
+- `USB UART`：MVP 的核心通信方式，连接 ESP32 和主机。ESP32 上报事件，主机返回动作指令。
+- `WiFi / HTTPS`：可选云端 AI 链路。主机通过网络调用 API，但不让云端直接控制底层硬件。
+- `Bluetooth`：可选扩展链路，可用于手机端遥控、参数配置或演示模式切换。
 
-`input -> MCU状态判断 -> 可选AI决策 -> 执行动作 -> 传感器再次反馈`
+## 数据如何流动
 
-具体表现为：
+系统的数据流可以概括为：
 
-1. 用户按按钮，ESP32 进入 `WAKE`。
-2. ESP32 把 `EVENT:BUTTON` 发送给 Python。
-3. Python 根据本地规则或云端返回 `ACT:GREET / ACT:THINK / ACT:RETREAT`。
-4. ESP32 根据动作驱动舵机、LED、蜂鸣器。
-5. 若距离传感器检测到前方过近，ESP32 直接切到 `ALERT`，不等待云端。
+`input -> MCU/CPU decision -> action command -> output -> feedback`
+
+具体过程如下：
+
+1. `Button` 被按下，ESP32 通过 GPIO 中断记录事件，状态从 `IDLE` 进入 `WAKE`。
+2. `HC-SR04` 周期性输出距离数据，ESP32 将 echo 时间转换为距离，并进行阈值判断。
+3. ESP32 通过 `USB UART` 发送事件，例如 `EVENT:BUTTON` 或 `DIST:12.5`。
+4. 主机侧 Python 接收事件，把按钮、距离、当前状态交给本地规则或可选云端 AI。
+5. AI 决策层输出动作，例如 `ACT:GREET`、`ACT:THINK`、`ACT:RETREAT`。
+6. 主机通过 `USB UART` 把动作指令发回 ESP32。
+7. ESP32 根据动作和本地状态机控制输出：
+   - 舵机执行头部动作
+   - LED 切换状态颜色
+   - 蜂鸣器播放确认音或告警音
+   - 浏览器界面显示状态、日志和仿真效果
+8. 如果距离低于安全阈值，ESP32 直接进入 `ALERT`，不等待云端结果，保证实时性。
+
+## 设计要点
+
+- 底层实时控制放在 ESP32，避免网络延迟影响安全反馈。
+- 高层 AI 决策放在主机或云端，便于扩展语音、对话和复杂策略。
+- 当前无实体硬件时，浏览器仿真器复现同一套输入、状态机、通信日志和输出反馈。
 
 ## 状态机设计
 
 ```mermaid
 stateDiagram-v2
     [*] --> IDLE
-    IDLE --> WAKE: 按钮按下
-    IDLE --> ALERT: 距离 < 阈值
-    WAKE --> TRACK: 收到主机动作/超时
-    TRACK --> ALERT: 距离 < 阈值 或 动作为 RETREAT
-    TRACK --> COOLDOWN: 动作结束
-    ALERT --> COOLDOWN: 障碍解除
-    COOLDOWN --> IDLE: 定时结束
+    IDLE --> WAKE: Button pressed
+    IDLE --> ALERT: Distance < threshold
+    WAKE --> TRACK: Host action received / timeout
+    TRACK --> ALERT: Distance < threshold or ACT:RETREAT
+    TRACK --> COOLDOWN: Action finished
+    ALERT --> COOLDOWN: Obstacle removed
+    COOLDOWN --> IDLE: Timer finished
 ```
 
 ## 主循环与中断机制
 
-这个设计同时使用了“中断 + 主循环”：
+这个设计同时使用“中断 + 主循环”：
 
 - 按钮通过 GPIO 中断触发，只负责置位事件标志。
-- 主循环负责：
-  - 周期性读取距离传感器
-  - 处理串口消息
-  - 执行状态迁移
-  - 控制舵机、LED、蜂鸣器
+- 主循环负责周期性读取距离传感器、处理串口消息、执行状态迁移，并控制舵机、LED、蜂鸣器。
 
-这样做的原因是：
-
-- 中断逻辑保持极简，避免在 ISR 中做耗时动作。
-- 所有复杂行为统一在主循环状态机里处理，更容易调试和解释。
+这样做可以让中断逻辑保持简单，也让所有复杂行为集中在状态机中，便于调试和展示。
 
 ## AI 接入选择
 
-### 默认选择：本地规则 + 可选云端扩展
+默认采用“本地规则 + 可选云端 API”的双模方案：
 
-原因：
-
-- 按钮、避障这类行为对实时性要求更高，不适合完全依赖网络。
-- 作业时间有限，本地规则更稳，云端作为扩展更容易保底。
-- 分层之后，答辩时可以明确说明：安全相关和基础闭环在本地，高层语义放在云端。
-
-## 延迟与成本权衡
-
-- 本地规则：延迟最低、成本几乎为零、稳定性最好，但智能程度有限。
-- 云端 API：表达能力更好，但存在网络延迟、API 成本和失败重试问题。
+- 本地规则：低延迟、低成本、稳定，适合按钮反馈和避障类实时行为。
+- 云端 API：表达能力更强，适合扩展语音理解和对话策略，但存在网络延迟和成本。
 
 因此本项目采用：
 
 - `实时控制 = MCU 本地`
 - `高层策略 = 主机本地规则或云端 AI`
-
