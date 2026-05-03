@@ -12,3 +12,6 @@ __pycache__/
 venv/
 .pio/
 .pytest_cache/
+mechanical/solidworks_minipal/assemblies/
+mechanical/solidworks_minipal/exports/
+~$*.SLDPRT
