@@ -6,7 +6,7 @@
 
 ## 推荐演示顺序
 
-先打开 [[simulation/index.html](../simulation/index.html)](https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html)。这个页面是本项目的交互仿真 Demo，用于替代实体硬件演示。
+先打开https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html这个页面是本项目的交互仿真 Demo，用于替代实体硬件演示。
 
 ### 场景 1：按钮唤醒
 
