@@ -4,7 +4,7 @@
 
 ## 打开方式
 
-直接用浏览器打开 [index.html](index.html)。
+直接用浏览器打开 https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html。
 
 如果要让仿真平台真正调用 Python AI 桥接，先在仓库根目录运行：
 
