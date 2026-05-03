@@ -93,12 +93,6 @@ set OPENAI_MODEL=gpt-4o-mini
 python host/ai_bridge.py --port COM5 --mode cloud
 ```
 
-## 展示建议
-
-- 先打开仿真 Demo，演示按钮唤醒和问候动作。
-- 再拖动距离滑块，演示距离触发告警。
-- 最后说明本地规则与云端 AI 的分层设计。
-
 ## GitHub Pages
 
 如果仓库启用 GitHub Pages，并将 source 设置为 `codex-ai-bridge-access` 分支根目录，仿真演示地址为：
