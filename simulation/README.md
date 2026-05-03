@@ -6,12 +6,22 @@
 
 直接用浏览器打开 [index.html](index.html)。
 
+如果要让仿真平台真正调用 Python AI 桥接，先在仓库根目录运行：
+
+```bash
+pip install -r host/requirements.txt
+python host/ai_bridge.py --mode local
+```
+
+然后再打开 [index.html](index.html)。页面中的 `Python AI 桥接` 会显示 `已连接`，此时按钮唤醒和对话输入都会请求本机的 `http://127.0.0.1:8890/ai/decide`。
+
 ## 可展示内容
 
 - 按钮唤醒：模拟 GPIO 输入和 `EVENT:BUTTON`
 - 距离传感器：通过滑块模拟 HC-SR04 距离变化
 - 状态机：展示 `IDLE / WAKE / TRACK / ALERT / COOLDOWN`
 - AI 决策：支持本地规则和云端 API 仿真两种模式
+- 对话输入：通过 Python 桥接返回 `reply` 和 `ACT:*` 动作
 - 输出反馈：可视化舵机角度、LED 颜色、蜂鸣器状态和串口日志
 
 ## 与实体方案的对应关系

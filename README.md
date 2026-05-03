@@ -21,6 +21,7 @@
 - 工程问题分析：[docs/03_engineering_analysis.md](docs/03_engineering_analysis.md)
 - 演示说明：[docs/05_demo_notes.md](docs/05_demo_notes.md)
 - 提交说明：[docs/06_submission.md](docs/06_submission.md)
+- AI 能力接入说明：[docs/08_ai_access.md](docs/08_ai_access.md)
 
 ## 核心闭环
 
@@ -59,7 +60,16 @@ simulation/           浏览器交互仿真 Demo
 
 ### 3. 主机侧 AI 桥接
 
-实体硬件调试时可运行：
+只连接浏览器仿真平台时可运行：
+
+```bash
+pip install -r host/requirements.txt
+python host/ai_bridge.py --mode local
+```
+
+然后打开 [simulation/index.html](simulation/index.html)，在输入框里直接和 `MiniPal` 对话。
+
+实体硬件调试时可指定串口：
 
 ```bash
 pip install -r host/requirements.txt

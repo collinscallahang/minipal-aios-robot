@@ -25,6 +25,7 @@ flowchart LR
 
     subgraph Comm["通信层 Communication"]
         UART["USB UART\nESP32 <-> Host"]
+        HTTP["Local HTTP\nBrowser simulator <-> Host"]
         WIFI["WiFi / HTTPS\nHost <-> Cloud API"]
         BLE["Bluetooth\n可选移动端扩展"]
     end
@@ -39,6 +40,8 @@ flowchart LR
     AI -->|"ACT:GREET / THINK / RETREAT"| CPU
     CPU -->|"ACT:*"| UART
     UART --> MCU
+    SCREEN -->|"POST /ai/decide"| HTTP
+    HTTP --> CPU
 
     CPU -.->|"可选云端推理"| WIFI
     WIFI -.-> AI
@@ -74,6 +77,7 @@ flowchart LR
 ### 通信模块
 
 - `USB UART`：MVP 的核心通信方式，连接 ESP32 和主机。ESP32 上报事件，主机返回动作指令。
+- `Local HTTP`：仿真平台调用主机 Python 桥接的接口。浏览器通过 `POST /ai/decide` 发送按钮、距离和文本消息，Python 返回动作和回复。
 - `WiFi / HTTPS`：可选云端 AI 链路。主机通过网络调用 API，但不让云端直接控制底层硬件。
 - `Bluetooth`：可选扩展链路，可用于手机端遥控、参数配置或演示模式切换。
 
