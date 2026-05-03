@@ -1,16 +1,16 @@
 # 提交说明
 
-## 推荐提交链接
+## 提交链接
 
-提交 GitHub 仓库链接即可。仓库中包含完整的系统架构、控制逻辑、结构设计、工程分析和可交互仿真 Demo。
+GitHub 仓库链接。仓库中包含完整的系统架构、控制逻辑、结构设计、工程分析和可交互仿真 Demo。
 
-如果启用 GitHub Pages，可将演示地址设置为：
+启用 GitHub Pages时演示地址设置为：
 
 ```text
 https://<github-username>.github.io/<repo-name>/simulation/
 ```
 
-## 评审查看顺序
+## 查看顺序
 
 1. 打开 [README.md](../README.md)，了解项目目标和交付物。
 2. 打开 [simulation/index.html](../simulation/index.html)，运行交互仿真 Demo。
