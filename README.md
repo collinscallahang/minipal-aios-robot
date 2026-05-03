@@ -15,7 +15,7 @@
 
 [MiniPal 仿真平台](https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html)
 
-这个链接会打开可交互网页，不是 GitHub 代码页。
+这个链接会打开可交互网页。
 
 ## 交付物对应关系
 
