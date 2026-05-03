@@ -9,6 +9,14 @@
 
 机器人前脸直接利用 HC-SR04 的双探头作为“眼睛”，既保留真实传感器功能，也形成更容易展示的桌宠外观。
 
+## 在线仿真平台
+
+直接打开网页体验：
+
+[MiniPal 仿真平台](https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html)
+
+这个链接会打开可交互网页，不是 GitHub 代码页。
+
 ## 交付物对应关系
 
 - 系统架构图：[docs/02_architecture.md](docs/02_architecture.md)
@@ -52,7 +60,7 @@ simulation/           浏览器交互仿真 Demo
 
 ### 1. 浏览器仿真
 
-直接用浏览器打开 [simulation/index.html](simulation/index.html)，即可演示按钮唤醒、距离告警、状态机迁移、AI 动作建议和输出反馈。
+直接用浏览器打开 [MiniPal 仿真平台](https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html)，即可演示按钮唤醒、距离告警、状态机迁移、AI 动作建议和输出反馈。
 
 ### 2. 固件
 
@@ -67,7 +75,7 @@ pip install -r host/requirements.txt
 python host/ai_bridge.py --mode local
 ```
 
-然后打开 [simulation/index.html](simulation/index.html)，在输入框里直接和 `MiniPal` 对话。
+然后打开 [MiniPal 仿真平台](https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html)，在输入框里直接和 `MiniPal` 对话。
 
 实体硬件调试时可指定串口：
 
@@ -93,8 +101,8 @@ python host/ai_bridge.py --port COM5 --mode cloud
 
 ## GitHub Pages
 
-如果仓库启用 GitHub Pages，并将 source 设置为 `main` 分支根目录，仿真演示地址为：
+如果仓库启用 GitHub Pages，并将 source 设置为 `codex-ai-bridge-access` 分支根目录，仿真演示地址为：
 
 ```text
-https://<github-username>.github.io/<repo-name>/simulation/
+https://collinscallahang.github.io/minipal-aios-robot/
 ```
