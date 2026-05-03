@@ -6,8 +6,9 @@ __pycache__/
 *.pyo
 *.log
 .env
+.github_token
+.github_token.txt
 .venv/
 venv/
 .pio/
 .pytest_cache/
-
