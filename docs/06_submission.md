@@ -11,7 +11,7 @@ https://<github-username>.github.io/<repo-name>/simulation/
 ## 查看顺序
 
 1. 打开 [README.md](../README.md)，了解项目目标和交付物。
-2. 打开 https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html，运行交互仿真 Demo。
+2. 打开 https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html ，运行交互仿真 Demo。
 3. 查看 [docs/02_architecture.md](02_architecture.md)，确认系统架构和数据流。
 4. 查看 [firmware/src/main.cpp](../firmware/src/main.cpp)，确认嵌入式状态机控制逻辑。
 5. 查看 [mechanical/minipal_structure_layout.svg](../mechanical/minipal_structure_layout.svg)，确认结构布局和关键尺寸。
