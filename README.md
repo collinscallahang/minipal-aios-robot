@@ -51,7 +51,7 @@ simulation/           浏览器交互仿真 Demo
 
 ### 1. 浏览器仿真
 
-直接用浏览器打开 [simulation/index.html](simulation/index.html)，即可演示按钮唤醒、距离告警、状态机迁移、AI 动作建议和输出反馈。
+直接用浏览器打开 https://raw.githack.com/collinscallahang/minipal-aios-robot/codex-ai-bridge-access/simulation/index.html，即可演示按钮唤醒、距离告警、状态机迁移、AI 动作建议和输出反馈。
 
 ### 2. 固件
 
