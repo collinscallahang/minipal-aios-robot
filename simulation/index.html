@@ -69,6 +69,18 @@
           <button class="mode-button" id="cloudMode" type="button">云端 API 仿真</button>
         </div>
 
+        <div class="bridge-block">
+          <div class="bridge-status">
+            <span>Python AI 桥接</span>
+            <strong id="bridgeStatus">检测中</strong>
+          </div>
+          <form class="chat-form" id="chatForm">
+            <input id="chatInput" type="text" placeholder="和 MiniPal 说一句话" autocomplete="off" />
+            <button type="submit">发送</button>
+          </form>
+          <div class="chat-window" id="chatWindow" aria-live="polite"></div>
+        </div>
+
         <div class="scenario-grid">
           <button id="normalScenario" type="button">问候场景</button>
           <button id="alertScenario" type="button">靠近告警</button>
@@ -106,6 +118,7 @@
           <div class="state-arrow">→</div>
           <div class="state-node" data-state="COOLDOWN">COOLDOWN</div>
           <div class="state-node alert-node" data-state="ALERT">ALERT</div>
+          <div class="state-node brake-node" data-state="EMERGENCY_BRAKE">EMERGENCY_BRAKE</div>
         </div>
 
         <div class="ai-decision">
