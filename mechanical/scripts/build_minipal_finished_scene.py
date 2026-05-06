@@ -1,8 +1,8 @@
-"""Generate the final MiniPal SolidWorks scene.
+"""Generate the final assembled MiniPal SolidWorks robot.
 
-This creates one self-contained SLDPRT that matches the requested submission
-style: transparent case, visible internal modules, and exploded reference
-modules around the robot like the SolidWorks screenshot.
+This creates one self-contained SLDPRT for submission. The output is an
+integrated product model that follows the browser simulator robot silhouette
+instead of the earlier exploded/reference layout.
 """
 
 from __future__ import annotations
@@ -71,6 +71,13 @@ COL = {
     "led": Color(0.08, 0.34, 0.72, specular=0.55, shininess=0.45),
     "red": Color(0.88, 0.16, 0.12),
     "wire": Color(0.03, 0.03, 0.04),
+    "sim_body": Color(0.93, 0.96, 0.98),
+    "sim_head": Color(0.96, 0.98, 1.0),
+    "sim_shadow": Color(0.58, 0.66, 0.74),
+    "sim_window": Color(0.72, 0.83, 0.91, transparency=0.10),
+    "sim_eye_blue": Color(0.05, 0.28, 0.52, specular=0.45, shininess=0.45),
+    "sim_eye_ring": Color(0.76, 0.82, 0.88),
+    "sim_led_blue": Color(0.04, 0.36, 0.70, specular=0.5, shininess=0.45),
 }
 
 
@@ -168,71 +175,69 @@ def cyl_y(model, name: str, c: tuple[float, float, float], d: float, h: float, c
     return feat
 
 
-def case_shell(model):
-    # Main transparent box, matching the screenshot's see-through case.
-    box(model, "transparent top panel", (0, 34, 0), (100, 3, 90), COL["glass"])
-    box(model, "transparent bottom panel", (0, -34, 0), (100, 3, 90), COL["glass"])
-    box(model, "transparent left wall", (-50, 0, 0), (3, 70, 90), COL["glass"])
-    box(model, "transparent right wall", (50, 0, 0), (3, 70, 90), COL["glass"])
-    box(model, "transparent front wall", (0, 0, -45), (100, 70, 3), COL["glass"])
-    box(model, "transparent rear wall", (0, 0, 45), (100, 70, 3), COL["glass"])
-    for x in (-51.8, 51.8):
-        box(model, "dark vertical case edge", (x, 0, -46.8), (2.4, 72, 2.4), COL["edge"])
-        box(model, "dark rear vertical case edge", (x, 0, 46.8), (2.4, 72, 2.4), COL["edge"])
-    for y in (-36, 36):
-        box(model, "dark horizontal case edge", (0, y, -46.8), (104, 2.4, 2.4), COL["edge"])
-        box(model, "dark rear horizontal case edge", (0, y, 46.8), (104, 2.4, 2.4), COL["edge"])
+def assembled_body(model):
+    # Product shell is kept as an integrated robot body, matching simulation/index.html.
+    box(model, "assembled robot body envelope", (0, 36, 0), (104, 92, 56), COL["sim_body"])
+    box(model, "body lower inset shadow", (10, 6, -30), (74, 14, 3), COL["sim_shadow"])
+    box(model, "body right side inset shadow", (42, 36, -30), (12, 78, 3), COL["sim_shadow"])
+    box(model, "body left edge seam", (-52, 36, -30), (3, 90, 3), COL["edge"])
+    box(model, "body right edge seam", (52, 36, -30), (3, 90, 3), COL["edge"])
+    box(model, "body top edge seam", (0, 82, -30), (104, 3, 3), COL["edge"])
+    box(model, "body bottom edge seam", (0, -10, -30), (104, 3, 3), COL["edge"])
+
+    cyl_z(model, "front LED status ring outer", (0, 60, -31.5), 28, 3.6, COL["sim_led_blue"])
+    cyl_z(model, "front LED status ring center", (0, 60, -33.2), 15, 3.8, COL["sim_body"])
+
+    box(model, "front ESP32 display window", (0, 30, -32), (70, 30, 3), COL["sim_window"])
+    box(model, "display text block ESP32", (-18, 34, -34), (24, 4, 1.4), COL["dark"])
+    box(model, "display text block STATE", (18, 24, -34), (30, 4, 1.4), COL["dark"])
+
+    for i, x in enumerate((-26, -16, -6, 4, 14, 24), start=1):
+        box(model, f"speaker grille integrated slot {i}", (x, 0, -33), (5, 3, 2), COL["dark"])
+
+    box(model, "internal 5V power pack seated in body", (18, 12, 8), (62, 12, 38), COL["battery"])
+    box(model, "internal ESP32 controller board seated", (0, 28, -2), (56, 3, 28), COL["esp"])
+    box(model, "internal wire harness routed", (-18, 45, -12), (3, 44, 3), COL["wire"])
+    box(model, "USB port side opening", (53, 30, -10), (3, 14, 9), COL["dark"])
 
 
-def internal_modules(model):
-    box(model, "internal 5V power bank / battery", (14, -20, -7), (62, 12, 42), COL["battery"])
-    box(model, "internal ESP32 controller board", (8, -2, -16), (58, 3, 30), COL["esp"])
-    box(model, "ESP32 module shield", (8, 4, -17), (24, 8, 18), COL["dark"])
-    box(model, "inside servo block", (15, 15, -8), (23, 32, 14), COL["servo"])
-    cyl_z(model, "inside servo rotating hub", (15, 15, -20), 18, 4, COL["horn"])
-    box(model, "inside servo horn bar", (15, 31, -20), (62, 5, 3), COL["horn"])
-    box(model, "front HC-SR04 sensor board installed", (-25, -3, -49), (45, 20, 2.5), COL["board"])
-    cyl_y(model, "installed left ultrasonic eye", (-37, -3, -54), 16, 8, COL["eye"])
-    cyl_y(model, "installed right ultrasonic eye", (-13, -3, -54), 16, 8, COL["eye"])
-    box(model, "top wake button module installed", (18, 39, -6), (52, 8, 5), COL["trim"])
-    cyl_z(model, "status LED ring on body", (-24, -1, -50), 14, 3, COL["led"])
-    box(model, "speaker slot", (12, -8, -50.5), (38, 4, 2), COL["dark"])
-    box(model, "wire harness inside", (-5, 20, -25), (65, 3, 3), COL["wire"])
-    box(model, "vertical wire harness", (-32, 8, -24), (3, 36, 3), COL["wire"])
+def assembled_head_and_motion(model):
+    box(model, "neck block with SG90 servo installed", (0, 91, 0), (30, 20, 36), COL["sim_shadow"])
+    box(model, "SG90 servo body inside neck", (0, 91, -6), (23, 18, 24), COL["servo"])
+    cyl_z(model, "SG90 servo hub under head", (0, 102, -27), 18, 4, COL["horn"])
+    box(model, "servo horn locked into head", (0, 109, -27), (56, 4, 3), COL["horn"])
+
+    box(model, "assembled head shell", (0, 130, 0), (86, 60, 44), COL["sim_head"])
+    box(model, "head lower face slot", (0, 111, -33), (40, 5, 3), COL["dark"])
+    box(model, "head right side shadow", (37, 130, -25), (8, 50, 3), COL["sim_shadow"])
+    box(model, "head bottom shadow", (0, 101, -25), (74, 7, 3), COL["sim_shadow"])
+
+    box(model, "HC-SR04 board installed behind face", (0, 132, -34), (58, 20, 2), COL["board"])
+    for side, x in (("left", -22), ("right", 22)):
+        cyl_z(model, f"{side} ultrasonic eye dark ring", (x, 134, -37), 23, 3.5, COL["dark"])
+        cyl_z(model, f"{side} ultrasonic eye silver ring", (x, 134, -39), 17, 3.5, COL["sim_eye_ring"])
+        cyl_z(model, f"{side} ultrasonic eye blue center", (x, 134, -41), 11, 3, COL["sim_eye_blue"])
+        cyl_z(model, f"{side} ultrasonic eye highlight", (x - 3, 138, -42.5), 3.2, 1.2, COL["sim_head"])
+
+    cyl_y(model, "top wake button installed", (0, 163, 0), 16, 8, COL["red"])
+    box(model, "top button mounting plate", (0, 158, 0), (30, 3, 20), COL["trim"])
 
 
-def exploded_parts(model):
-    # Left side: controller, sensor and small modules exploded around the case.
-    box(model, "exploded ESP32 board reference", (-125, -8, -12), (55, 28, 3), COL["esp"])
-    box(model, "exploded ESP32 USB connector", (-94, -8, -12), (8, 10, 6), COL["dark"])
-    box(model, "exploded ESP32 pin row upper", (-125, 8, -12), (56, 3, 3), COL["pin"])
-    box(model, "exploded ESP32 pin row lower", (-125, -24, -12), (56, 3, 3), COL["pin"])
+def assembled_base_details(model):
+    box(model, "front trim strip installed", (0, 84, -33), (82, 5, 4), COL["trim"])
+    box(model, "rear translucent service panel", (0, 38, 30), (82, 50, 3), COL["glass"])
+    box(model, "left foot installed", (-34, -18, -8), (22, 10, 18), COL["edge"])
+    box(model, "right foot installed", (34, -18, -8), (22, 10, 18), COL["edge"])
+    box(model, "rear stabilizer foot", (0, -18, 20), (58, 8, 12), COL["edge"])
+    cyl_z(model, "WS2812 LED module mounted behind ring", (0, 60, -26), 12, 4, COL["led"])
+    cyl_z(model, "buzzer installed behind speaker grille", (25, 0, -20), 14, 8, COL["dark"])
+    box(model, "assembled robot footprint shadow", (0, -24, 0), (124, 3, 78), COL["sim_shadow"])
 
-    box(model, "exploded HC-SR04 board reference", (-115, -42, -22), (45, 20, 2.5), COL["board"])
-    cyl_y(model, "exploded HC-SR04 left eye", (-127, -42, -29), 16, 8, COL["eye"])
-    cyl_y(model, "exploded HC-SR04 right eye", (-103, -42, -29), 16, 8, COL["eye"])
 
-    box(model, "exploded WS2812 LED board", (-160, -20, -5), (12, 12, 2), COL["dark"])
-    cyl_z(model, "exploded WS2812 diffuser", (-160, -20, -8), 8, 3, COL["led"])
-    cyl_z(model, "exploded buzzer module", (-142, 14, -8), 12, 9, COL["dark"])
-    box(model, "exploded button body", (-165, 23, -5), (10, 16, 8), COL["red"])
-
-    # Top/right side: cover panels, feet and servo group, like the screenshot.
-    for i, x in enumerate((-38, 0, 38), start=1):
-        cyl_z(model, f"exploded rubber foot {i}", (x, 72, 4), 13, 5, COL["edge"])
-    box(model, "exploded top lid long panel", (16, 65, -2), (86, 3, 88), COL["glass"])
-    box(model, "exploded front trim strip", (20, 54, -50), (72, 8, 4), COL["trim"])
-    box(model, "exploded rear cover strip", (12, 58, 42), (78, 4, 4), COL["glass"])
-
-    box(model, "exploded SG90 servo body", (112, 30, -5), (23, 32, 14), COL["servo"])
-    box(model, "exploded servo mounting ear upper", (112, 49, -5), (42, 5, 14), COL["servo"])
-    box(model, "exploded servo mounting ear lower", (112, 11, -5), (42, 5, 14), COL["servo"])
-    cyl_z(model, "exploded servo hub", (112, 30, -18), 18, 5, COL["horn"])
-    box(model, "exploded servo horn", (112, 59, -18), (64, 4, 3), COL["horn"])
-    box(model, "exploded servo cable", (83, 22, -16), (3, 44, 3), COL["wire"])
-
-    box(model, "right side dimension marker 70mm", (150, 0, -45), (2, 70, 2), COL["edge"])
-    box(model, "bottom dimension marker 100mm", (0, -57, -45), (100, 2, 2), COL["edge"])
+def assembled_robot(model):
+    assembled_body(model)
+    assembled_head_and_motion(model)
+    assembled_base_details(model)
 
 
 def save_all(model):
@@ -241,6 +246,8 @@ def save_all(model):
     model.ViewZoomtofit2()
     model.SaveAs3(str(FINISHED), 0, 1)
     model.SaveAs3(str(STEP), 0, 1)
+    model.ShowNamedView2("*Back", 2)
+    model.ViewZoomtofit2()
     model.SaveAs3(str(PNG), 0, 1)
 
 
@@ -251,9 +258,7 @@ def main() -> int:
     except Exception:
         pass
     model = new_part(sw)
-    case_shell(model)
-    internal_modules(model)
-    exploded_parts(model)
+    assembled_robot(model)
     save_all(model)
     print(f"created {FINISHED}")
     print(f"created {STEP}")

@@ -2,24 +2,24 @@
 
 ## Open This First
 
-- Final screenshot-style model: `finished/MiniPal_finished_robot.SLDPRT`
+- Final assembled model: `finished/MiniPal_finished_robot.SLDPRT`
 - STEP backup: `finished/MiniPal_finished_robot.step`
 - Preview image: `finished/MiniPal_finished_robot_preview.png`
 - Generator script: `../scripts/build_minipal_finished_scene.py`
 
 ## What It Looks Like
 
-The final model is the transparent internal/exploded structure view requested
-for submission. It is one self-contained SolidWorks part file, so opening
-`finished/MiniPal_finished_robot.SLDPRT` shows the whole scene directly.
+The final model is an assembled MiniPal robot product, not an exploded layout.
+It is one self-contained SolidWorks part file, so opening
+`finished/MiniPal_finished_robot.SLDPRT` shows the whole robot directly.
 
 It includes:
 
-- transparent `100 x 90 x 70 mm` case envelope
-- internal ESP32, battery, servo, HC-SR04, LED, buzzer and wiring blocks
-- HC-SR04 double ultrasonic eyes
-- top/front trim and case edge details
-- exploded reference modules around the case, matching the submitted screenshot style
+- integrated body, neck, head and feet matching the browser simulation robot
+- HC-SR04 double ultrasonic eyes installed into the face
+- top wake button, front LED ring, ESP32 display window and speaker grille
+- seated ESP32, battery, servo, LED, buzzer and wiring details inside the body
+- no floating reference modules around the finished robot
 
 ## Reference Dimensions
 
